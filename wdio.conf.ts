@@ -1,4 +1,9 @@
 import type { Options } from "@wdio/types";
+import * as dotenv from "dotenv";
+import { rimraf } from "rimraf";
+
+dotenv.config();
+
 export const config: Options.Testrunner = {
   //
   // ====================
@@ -148,7 +153,7 @@ export const config: Options.Testrunner = {
       {
         outputDir: "allure-results",
         disableWebdriverStepsReporting: true,
-        disableMochaHooks: true,
+        disableMochaHooks: false,
         disableWebdriverScreenshotsReporting: false,
         useCucumberStepReporter: true,
       },
@@ -196,8 +201,9 @@ export const config: Options.Testrunner = {
    * @param {object} config wdio configuration object
    * @param {Array.<Object>} capabilities list of capabilities details
    */
-  // onPrepare: function (config, capabilities) {
-  // },
+  onPrepare: function (config, capabilities) {
+    rimraf.sync("./allure-results");
+  },
   /**
    * Gets executed before a worker process is spawned and can be used to initialize specific service
    * for that worker as well as modify runtime environments in an async fashion.
@@ -293,8 +299,11 @@ export const config: Options.Testrunner = {
    * @param {number}                 result.duration  duration of scenario in milliseconds
    * @param {object}                 context          Cucumber World object
    */
-  // afterScenario: function (world, result, context) {
-  // },
+  afterScenario: async function (world, result, context) {
+    if (!result.passed) {
+      await browser.takeScreenshot();
+    }
+  },
   /**
    *
    * Runs after a Cucumber Feature.

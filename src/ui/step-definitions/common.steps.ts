@@ -35,3 +35,7 @@ Then(/^I should be on "([^"]*)" page$/, async function (page: string) {
   await pages[page].waitForSpinnerToHide();
   await pages[page].waitForOpened();
 });
+
+Then(/^I wait for "(.*)" seconds$/, async function (delay: number) {
+  await browser.pause(delay * 1000);
+});
